@@ -7,6 +7,11 @@ export const handler : APIGatewayProxyHandler = async (event) => {
   const {id} =  event.pathParameters;
   return {
     statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify(find(data, (d) => d.id == id)),
   };
 }
