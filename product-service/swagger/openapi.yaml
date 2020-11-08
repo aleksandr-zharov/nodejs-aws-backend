@@ -1,0 +1,105 @@
+openapi: 3.0.3
+
+info:
+  title: nodejs-aws-be
+  version: 0.0.0
+  contact:
+    name: Aleksandr Zharov
+    url: https://github.com/aleksandr-zharov/nodejs-aws-backend
+
+servers:
+  - url: https://djdaxun8fl.execute-api.eu-west-1.amazonaws.com/dev/
+
+paths:
+
+  /products:
+    get:
+      operationId: getProductsList
+      tags:
+        - Product Service
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDto'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /products/{id}:
+    get:
+      operationId: getProductById
+      tags:
+        - Product Service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+
+  schemas:
+
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        size:
+          type: string
+        color:
+          type: string
+        gender:
+          type: string
+        price:
+          type: number
+      required:
+        - id
+        - name
+        - price
+
+    HttpError:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+  responses:
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
