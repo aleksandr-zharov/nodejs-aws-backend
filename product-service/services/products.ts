@@ -1,7 +1,8 @@
-import {builder, client} from './config';
+import {builder, pool} from './config';
+import {DefaultError} from "../common/errors";
 
 export const getProducts = async () => {
-    await client.connect();
+    const client = await pool.connect();
     const query = builder
         .select(['id', 'name', 'description', 'category', 'size', 'color', 'gender', 'price', 'count'])
         .from('products')
@@ -11,13 +12,16 @@ export const getProducts = async () => {
     try {
         const result = await client.query(query);
         return result.rows;
-    } finally {
+    } catch (e) {
+        throw new DefaultError(e.toString(), 500);
+    }
+    finally {
         await client.end();
     }
 };
 
 export const getProductById = async (id) => {
-    await client.connect();
+    const client = await pool.connect();
 
     const query = builder
         .select(['products.id', 'name', 'description', 'category', 'size', 'color', 'gender', 'price', 'count'])
@@ -29,19 +33,28 @@ export const getProductById = async (id) => {
     try {
         const result = await client.query(query);
         return result.rows[0];
+    } catch (e) {
+        throw new DefaultError(e.toString(), 500);
     } finally {
         await client.end();
     }
 };
 
 export const createProduct = async (payload) => {
-    await client.connect();
+    const client = await pool.connect();
 
     try {
         await client.query('BEGIN');
-        const { name, description, category, size, color, gender, price } = payload;
         const query = builder
-            .insert({ name, description, category, size, color, gender, price })
+            .insert({
+                name: payload.name,
+                description: payload.description,
+                category: payload.category,
+                size: payload.size,
+                color: payload.color,
+                gender: payload.gender,
+                price: payload.price
+            })
             .into('products')
             .returning('id')
             .toString();
@@ -61,11 +74,12 @@ export const createProduct = async (payload) => {
 
         await client.query('COMMIT');
 
-        return productInsertResult.rows[0];
-    } catch (err) {
-        await client.query('ROLLBACK');
+        const data = {...payload, id: productInsertResult.rows[0].id};
 
-        throw err;
+        return data;
+    } catch (e) {
+        await client.query('ROLLBACK');
+        throw new DefaultError(e.toString(), 500);
     } finally {
         await client.end();
     }
