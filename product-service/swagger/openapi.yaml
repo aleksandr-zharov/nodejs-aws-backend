@@ -99,6 +99,8 @@ components:
           type: string
         price:
           type: number
+        count:
+          type: number
       required:
         - id
         - name
