@@ -20,7 +20,7 @@ export const handler : APIGatewayProxyHandler = async (event) => {
       color: Joi.string().required(),
       gender: Joi.string().required(),
       price: Joi.number().optional(),
-      count: Joi.number().optional()
+      count: Joi.number().required()
     });
 
     const validationResult = productScheme.validate(payload);
