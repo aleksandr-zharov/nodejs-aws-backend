@@ -28,6 +28,30 @@ paths:
                   $ref: '#/components/schemas/ProductDto'
         500:
           $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: createProduct
+      tags:
+        - Product Service
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDto'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDto'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+        400:
+          $ref: '#/components/responses/InternalServerError'
 
   /products/{id}:
     get:

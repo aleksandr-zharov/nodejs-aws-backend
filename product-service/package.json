@@ -8,6 +8,7 @@
     "deploy": "sls deploy"
   },
   "dependencies": {
+    "joi": "^17.3.0",
     "knex": "^0.21.12",
     "lodash": "^4.17.20",
     "pg": "^8.4.2",
