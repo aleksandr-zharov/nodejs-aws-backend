@@ -76,6 +76,34 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerError'
 
+  /import:
+    get:
+      operationId: importProductsFile
+      tags:
+        - Import Service
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signedUrl:
+                    type: string
+                required:
+                  - signedUrl
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
 components:
 
   schemas:
@@ -122,9 +150,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/HttpError'
-
     InternalServerError:
       description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+    BadRequest:
+      description: Bad Request
       content:
         application/json:
           schema:
