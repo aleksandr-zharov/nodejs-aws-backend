@@ -1,5 +1,4 @@
 import {S3Event} from 'aws-lambda';
-import 'source-map-support/register';
 import csv from 'csv-parser';
 import { S3 } from 'aws-sdk';
 import {errorHandler, successHandler} from "../common/default";
