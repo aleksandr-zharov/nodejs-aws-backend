@@ -22,7 +22,7 @@ export const handler : APIGatewayProxyHandler = async (event) => {
       Key: `uploaded/${name}`,
     });
 
-    return successHandler({ signedUrl });
+    return successHandler({ signedUrl: signedUrl });
   } catch (e) {
     return errorHandler(e);
   }

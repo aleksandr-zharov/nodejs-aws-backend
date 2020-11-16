@@ -1,5 +1,5 @@
 import {S3Event} from 'aws-lambda';
-import csv from 'csv-parser';
+import csvParser from 'csv-parser';
 import { S3 } from 'aws-sdk';
 import {errorHandler, successHandler} from "../common/default";
 
@@ -21,7 +21,7 @@ export const handler = async (event: S3Event) => {
           Key: filePath,
         }).createReadStream();
         s3Stream
-            .pipe(csv())
+            .pipe(csvParser())
             .on('data', (data) => {
               console.log(JSON.stringify(data, null, 4));
             })
