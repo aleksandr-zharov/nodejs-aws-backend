@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import * as AWSMock from 'aws-sdk-mock';
-import { handler } from './importProductsFile';
+import { handler } from './import-products-file';
 import {errorHandler, successHandler} from "../common/default";
 import {DefaultError} from "../common/errors";
 
