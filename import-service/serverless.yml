@@ -1,42 +1,33 @@
 service:
   name: import-service
+  profile: pesonal
 
 provider:
   name: aws
   runtime: nodejs12.x
-  region: eu-west-1
+  region: ${self:provider.environment.S3_REGION}
   stage: ${opt:stage, 'dev'}
-  profile: pesonal
 
   environment:
-    S3_BUCKET_NAME: az-import-bucket
+    S3_BUCKET_NAME: az-import-bucket-be
     S3_REGION: eu-west-1
 
   iamRoleStatements:
     - Action:
-        - s3:ListBucket
-      Effect: Allow
+        - "s3:ListBucket"
+      Effect: "Allow"
       Resource:
         - arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}
     - Action:
-        - s3:*
-      Effect: Allow
+        - "s3:*"
+      Effect: "Allow"
       Resource:
         - arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
 
 plugins:
-  - serverless-plugin-webpack
+  - serverless-webpack
 
 functions:
-  importFileParser:
-    handler: handlers/importFileParser.handler
-    events:
-      - s3:
-          bucket: ${self:provider.environment.S3_BUCKET_NAME}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: ${self:provider.environment.S3_UPLOADED_PREFIX}
-          existing: true
   importProductsFile:
     handler: handlers/importProductsFile.handler
     events:
@@ -48,3 +39,12 @@ functions:
             parameters:
               querystrings:
                 name: true
+  importFileParser:
+    handler: handlers/importFileParser.handler
+    events:
+      - s3:
+          bucket: ${self:provider.environment.S3_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true

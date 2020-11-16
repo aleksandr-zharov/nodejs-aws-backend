@@ -23,6 +23,7 @@ export const handler = async (event: S3Event) => {
         .createReadStream()
         .on('error', reject)
         .pipe(csvParser())
+        .on('data', console.log)
         .on('error', reject)
         .on('end', resolve);
       });
