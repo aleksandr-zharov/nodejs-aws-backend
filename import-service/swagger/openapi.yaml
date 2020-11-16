@@ -1,0 +1,99 @@
+openapi: 3.0.3
+
+info:
+  title: nodejs-aws-be
+  version: 0.0.0
+  contact:
+    name: Aleksandr Zharov
+    url: https://github.com/aleksandr-zharov/nodejs-aws-backend
+
+servers:
+  - url: https://djdaxun8fl.execute-api.eu-west-1.amazonaws.com/dev/
+
+paths:
+
+  /import:
+    get:
+      operationId: importProductsFile
+      tags:
+        - Import Service
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signedUrl:
+                    type: string
+                required:
+                  - signedUrl
+        400:
+          $ref: '#/components/responses/BadRequest'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+
+  schemas:
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        size:
+          type: string
+        color:
+          type: string
+        gender:
+          type: string
+        price:
+          type: number
+        count:
+          type: number
+      required:
+        - id
+        - name
+        - price
+
+    HttpError:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+  responses:
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HttpError'

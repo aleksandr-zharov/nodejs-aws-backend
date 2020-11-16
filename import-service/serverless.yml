@@ -10,9 +10,7 @@ provider:
 
   environment:
     S3_BUCKET_NAME: az-import-bucket
-    S3_PARSED_PREFIX: parsed/
     S3_REGION: eu-west-1
-    S3_UPLOADED_PREFIX: uploaded/
 
   iamRoleStatements:
     - Action:
