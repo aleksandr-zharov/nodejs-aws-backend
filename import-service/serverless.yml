@@ -1,16 +1,16 @@
 service:
-  name: import-service
+  name: import-service-be
   profile: pesonal
 
 provider:
   name: aws
   runtime: nodejs12.x
-  region: ${self:provider.environment.S3_REGION}
-  stage: ${opt:stage, 'dev'}
+  region: eu-west-1
+  stage: dev
 
   environment:
     S3_BUCKET_NAME: az-import-bucket-be
-    S3_REGION: eu-west-1
+    S3_REGION: ${self:provider.region}
 
   iamRoleStatements:
     - Action:
@@ -29,7 +29,7 @@ plugins:
 
 functions:
   importProductsFile:
-    handler: handlers/importProductsFile.handler
+    handler: handlers/import-products-file.handler
     events:
       - http:
           path: import
@@ -39,8 +39,9 @@ functions:
             parameters:
               querystrings:
                 name: true
+
   importFileParser:
-    handler: handlers/importFileParser.handler
+    handler: handlers/import-file-parser.handler
     events:
       - s3:
           bucket: ${self:provider.environment.S3_BUCKET_NAME}

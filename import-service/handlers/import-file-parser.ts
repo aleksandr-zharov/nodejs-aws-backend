@@ -1,7 +1,8 @@
 import {S3Event} from 'aws-lambda';
 import 'source-map-support/register';
-import csvParser from 'csv-parser';
-import AwsSdk from 'aws-sdk';
+import csv from 'csv-parser';
+import { S3 } from 'aws-sdk';
+import {errorHandler, successHandler} from "../common/default";
 
 const bucketName = process.env.S3_BUCKET_NAME;
 const region = process.env.S3_REGION;
@@ -9,23 +10,24 @@ const region = process.env.S3_REGION;
 export const handler = async (event: S3Event) => {
   try {
     console.log('importFileParser:', event);
-    const s3 = new AwsSdk.S3({ region });
+    const s3 = new S3({ region });
 
     for (const record of event.Records) {
       const filePath = record.s3.object.key;
       const destination = filePath.replace('uploaded', 'parsed');
 
       await new Promise((resolve, reject) => {
-        s3.getObject({
+        const s3Stream = s3.getObject({
           Bucket: bucketName,
           Key: filePath,
-        })
-        .createReadStream()
-        .on('error', reject)
-        .pipe(csvParser())
-        .on('data', console.log)
-        .on('error', reject)
-        .on('end', resolve);
+        }).createReadStream();
+        s3Stream
+            .pipe(csv())
+            .on('data', (data) => {
+              console.log(JSON.stringify(data, null, 4));
+            })
+            .on('end', resolve)
+            .on('error', reject);
       });
 
       await s3.copyObject({
@@ -39,7 +41,10 @@ export const handler = async (event: S3Event) => {
         Key: filePath,
       }).promise();
     }
+
+    return successHandler({});
   } catch (err) {
     console.error(err);
+    return errorHandler(err);
   }
 };
