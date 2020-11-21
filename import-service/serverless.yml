@@ -11,6 +11,10 @@ provider:
   environment:
     S3_BUCKET_NAME: az-import-bucket-be
     S3_REGION: ${self:provider.region}
+    SQS_URL:
+      Ref: SQSQueue
+    SNS_ARN:
+      Ref: SNSTopic
 
   iamRoleStatements:
     - Action:
@@ -23,9 +27,25 @@ provider:
       Effect: "Allow"
       Resource:
         - arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
+    - Action:
+        - "sqs:*"
+      Effect: "Allow"
+      Resource:
+        - Fn::GetAtt: [ SQSQueue, Arn ]
+    - Action:
+        - "sns:*"
+      Effect: "Allow"
+      Resource:
+        Ref: SNSTopic
 
 plugins:
   - serverless-webpack
+
+custom:
+  webpack:
+    includeModules:
+      forceInclude:
+        - csv-parser
 
 functions:
   importProductsFile:
@@ -49,3 +69,27 @@ functions:
           rules:
             - prefix: uploaded/
           existing: true
+  catalogBatchProcess:
+    handler: handlers/catalog-batch-process.handler
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt: [ SQSQueue, Arn ]
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: rs-product-queue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: rs-product-topic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: hdg_lo@mail.ru
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
