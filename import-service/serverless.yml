@@ -1,0 +1,51 @@
+service:
+  name: import-service-be-33
+  profile: pesonal
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  stage: dev
+
+  environment:
+    S3_BUCKET_NAME: az-import-bucket-be
+    S3_REGION: ${self:provider.region}
+
+  iamRoleStatements:
+    - Action:
+        - "s3:ListBucket"
+      Effect: "Allow"
+      Resource:
+        - arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}
+    - Action:
+        - "s3:*"
+      Effect: "Allow"
+      Resource:
+        - arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
+
+plugins:
+  - serverless-webpack
+
+functions:
+  importProductsFile:
+    handler: handlers/import-products-file.handler
+    events:
+      - http:
+          path: import
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                name: true
+
+  importFileParser:
+    handler: handlers/import-file-parser.handler
+    events:
+      - s3:
+          bucket: ${self:provider.environment.S3_BUCKET_NAME}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true

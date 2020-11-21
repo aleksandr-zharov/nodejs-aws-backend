@@ -12,74 +12,37 @@ servers:
 
 paths:
 
-  /products:
+  /import:
     get:
-      operationId: getProductsList
+      operationId: importProductsFile
       tags:
-        - Product Service
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductDto'
-        500:
-          $ref: '#/components/responses/InternalServerError'
-    post:
-      operationId: createProduct
-      tags:
-        - Product Service
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductDto'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductDto'
-        500:
-          $ref: '#/components/responses/InternalServerError'
-        400:
-          $ref: '#/components/responses/InternalServerError'
-
-  /products/{id}:
-    get:
-      operationId: getProductById
-      tags:
-        - Product Service
+        - Import Service
       parameters:
-        - name: id
-          in: path
+        - name: name
+          in: query
           required: true
           schema:
-            type: number
+            type: string
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductDto'
-        404:
-          $ref: '#/components/responses/NotFound'
+                type: object
+                properties:
+                  signedUrl:
+                    type: string
+                required:
+                  - signedUrl
+        400:
+          $ref: '#/components/responses/BadRequest'
         500:
           $ref: '#/components/responses/InternalServerError'
 
 components:
 
   schemas:
-
     ProductDto:
       type: object
       properties:
