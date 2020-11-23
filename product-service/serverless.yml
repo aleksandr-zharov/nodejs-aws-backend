@@ -70,7 +70,7 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: rs-product-topic
-    SNSSubscription:
+    MainSNSSubscription:
       Type: AWS::SNS::Subscription
       Properties:
         Endpoint: ${env:EMAIL}
