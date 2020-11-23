@@ -4,13 +4,11 @@ import {errorHandler, successHandler} from "../common/default";
 import * as csv from 'csv-parser';
 
 const bucketName = process.env.S3_BUCKET_NAME;
-const region = process.env.S3_REGION;
-const sqsUrl = process.env.SQS_URL;
 
 export const handler = async (event: S3Event) => {
   try {
     console.log('importFileParser:', event);
-    const s3 = new S3({ region });
+    const s3 = new S3({ region: process.env.S3_REGION });
     const queue = new SQS();
 
     for (const record of event.Records) {
@@ -29,7 +27,7 @@ export const handler = async (event: S3Event) => {
 
               queue.sendMessage({
                 MessageBody: JSON.stringify(data),
-                QueueUrl: sqsUrl,
+                QueueUrl: process.env.SQS_URL,
               }, (error, data) => {
                 if (error) {
                   console.error('importFileParser::SQS::error:', error);
