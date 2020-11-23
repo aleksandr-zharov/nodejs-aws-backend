@@ -25,6 +25,12 @@ export const handler = async (event: SQSEvent) => {
       Subject: 'Some products was added',
       Message: `${list} products have been created: ${list.map(r => r.id).join(', ')}.`,
       TopicArn: process.env.SNS_ARN,
+      MessageAttributes: {
+        numOfProducts: {
+          DataType: 'Number',
+          StringValue: JSON.stringify(list.length),
+        },
+      },
     }, () => {
       console.log('catalogBatchProcess sent message to you');
     });

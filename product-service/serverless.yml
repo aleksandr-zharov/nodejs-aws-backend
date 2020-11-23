@@ -73,7 +73,24 @@ resources:
     SNSSubscription:
       Type: AWS::SNS::Subscription
       Properties:
-        Endpoint: hdg_lo@mail.ru
+        Endpoint: ${env:EMAIL}
+        FilterPolicy:
+          numOfProducts:
+            - numeric:
+                - "<"
+                - 2
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+    ExtraSnsSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EXTRA_EMAIL}
+        FilterPolicy:
+          numOfProducts:
+            - numeric:
+                - ">="
+                - 2
         Protocol: email
         TopicArn:
           Ref: SNSTopic
