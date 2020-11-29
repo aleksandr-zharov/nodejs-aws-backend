@@ -11,6 +11,8 @@ provider:
   environment:
     S3_BUCKET_NAME: az-import-bucket-be
     S3_REGION: ${self:provider.region}
+    SQS_URL:
+      Ref: SQSQueue
 
   iamRoleStatements:
     - Action:
@@ -23,9 +25,20 @@ provider:
       Effect: "Allow"
       Resource:
         - arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
+    - Action:
+        - "sqs:*"
+      Effect: "Allow"
+      Resource:
+        - Fn::GetAtt: [ SQSQueue, Arn ]
 
 plugins:
   - serverless-webpack
+
+custom:
+  webpack:
+    includeModules:
+      forceInclude:
+        - csv-parser
 
 functions:
   importProductsFile:
@@ -49,3 +62,14 @@ functions:
           rules:
             - prefix: uploaded/
           existing: true
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: rs-product-queue
+  Outputs:
+    SQSQueueArn:
+      Value:
+        'Fn::GetAtt': [ 'SQSQueue', 'Arn' ]

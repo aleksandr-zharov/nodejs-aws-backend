@@ -24,6 +24,15 @@ provider:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    SNS_ARN:
+      Ref: SNSTopic
+
+  iamRoleStatements:
+    - Action:
+        - "sns:*"
+      Effect: "Allow"
+      Resource:
+        Ref: SNSTopic
 
 functions:
   getProductsById:
@@ -47,3 +56,41 @@ functions:
           method: post
           path: products
           cors: true
+  catalogBatchProcess:
+    handler: handlers/catalog-batch-process.handler
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            '${cf:import-service-be-33-${self:provider.stage}.SQSQueueArn}'
+
+resources:
+  Resources:
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: rs-product-topic
+    MainSNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EMAIL}
+        FilterPolicy:
+          numOfProducts:
+            - numeric:
+                - "<"
+                - 2
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+    ExtraSnsSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:EXTRA_EMAIL}
+        FilterPolicy:
+          numOfProducts:
+            - numeric:
+                - ">="
+                - 2
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
