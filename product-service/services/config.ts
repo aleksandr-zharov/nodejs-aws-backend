@@ -1,6 +1,7 @@
 import knex from 'knex';
+import {Pool} from 'pg';
 
-export const config = {
+const config = {
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     user: process.env.DB_USER,
     host: 'rsdb.cjur5r3am16a.eu-west-1.rds.amazonaws.com',
@@ -12,4 +13,5 @@ export const config = {
     connectionTimeoutMillis: 2000,
 };
 
+export const pool = new Pool(config);
 export const builder = knex({ client: 'pg' });

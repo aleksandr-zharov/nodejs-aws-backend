@@ -1,10 +1,8 @@
-import {builder, config} from './config';
-import {Client} from 'pg';
+import {builder, pool} from './config';
 import {DefaultError} from "../common/errors";
 
 export const getProducts = async () => {
-    const client = new Client(config);
-    await client.connect();
+    const client = await pool.connect();
     const query = builder
         .select(['id', 'name', 'description', 'category', 'size', 'color', 'gender', 'price', 'count'])
         .from('products')
@@ -23,8 +21,7 @@ export const getProducts = async () => {
 };
 
 export const getProductById = async (id) => {
-    const client = new Client(config);
-    await client.connect();
+    const client = await pool.connect();
 
     const query = builder
         .select(['products.id', 'name', 'description', 'category', 'size', 'color', 'gender', 'price', 'count'])
@@ -44,8 +41,7 @@ export const getProductById = async (id) => {
 };
 
 export const createProduct = async (payload) => {
-    const client = new Client(config);
-    await client.connect();
+    const client = await pool.connect();
 
     try {
         await client.query('BEGIN');
