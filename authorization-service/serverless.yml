@@ -1,0 +1,24 @@
+service:
+  name: authorization-service
+  profile: pesonal
+
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  stage: dev
+
+  environment:
+
+  iamRoleStatements:
+
+functions:
+
+resources:
+  Resources:
+
+  Outputs:
