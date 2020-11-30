@@ -4,7 +4,7 @@ export const handler: APIGatewayTokenAuthorizerHandler = async (event: APIGatewa
   try {
     const {authorizationToken, methodArn} = event;
     console.log(`authorizationToken: ${authorizationToken}, methodArn: ${methodArn}`);
-    if (authorizationToken) {
+    if (!authorizationToken) {
       throw new Error("Unauthorized");
     }
     const principalId = authorizationToken.split(' ')[1];
