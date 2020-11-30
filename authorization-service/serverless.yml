@@ -2,23 +2,22 @@ service:
   name: authorization-service
   profile: pesonal
 
-
-plugins:
-  - serverless-webpack
-
 provider:
   name: aws
   runtime: nodejs12.x
   region: eu-west-1
   stage: dev
 
-  environment:
-
-  iamRoleStatements:
+plugins:
+  - serverless-webpack
+  - serverless-dotenv-plugin
 
 functions:
+  basicAuthorizer:
+    handler: handlers/basic-authorizer.handler
 
 resources:
-  Resources:
-
   Outputs:
+    basicAuthorizerArn:
+      Value:
+        'Fn::GetAtt': [ 'BasicAuthorizerLambdaFunction', 'Arn' ]
