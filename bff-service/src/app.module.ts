@@ -3,7 +3,7 @@ import {ConfigModule} from '@nestjs/config';
 import {AppController} from './app.controller';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}), CacheModule.register({ttl : 120}), HttpModule],
+  imports: [ConfigModule.forRoot(), CacheModule.register({ttl : 120}), HttpModule],
   controllers: [AppController],
   providers: [],
 })
